@@ -1,6 +1,6 @@
-package com.example.graphqlex.Repository;
+package com.example.graphqlex.repository;
 
-import com.example.graphqlex.Model.Book;
+import com.example.graphqlex.models.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

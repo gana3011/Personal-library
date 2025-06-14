@@ -1,4 +1,4 @@
-package com.example.graphqlex.Model;
+package com.example.graphqlex.models;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;

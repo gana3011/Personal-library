@@ -1,13 +1,17 @@
-package com.example.graphqlex.Controller;
+package com.example.graphqlex.controller;
 
-import com.example.graphqlex.Model.Author;
-import com.example.graphqlex.Model.Book;
-import com.example.graphqlex.Repository.AuthorRepository;
-import com.example.graphqlex.Repository.BookRepository;
+import com.example.graphqlex.dto.BookDto;
+import com.example.graphqlex.models.Author;
+import com.example.graphqlex.models.Book;
+import com.example.graphqlex.models.User;
+import com.example.graphqlex.repository.AuthorRepository;
+import com.example.graphqlex.repository.BookRepository;
+import com.example.graphqlex.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -18,6 +22,7 @@ import java.util.List;
 public class BookController {
     private final BookRepository bookRepo;
     private final AuthorRepository authRepo;
+    private final UserRepository userRepo;
 
     @QueryMapping
     public List<Book> fetchBooks(){
@@ -30,13 +35,14 @@ public class BookController {
     }
 
     @MutationMapping
-    public Book addBook(@Argument String name, @Argument String author, @Argument String status){
-        Author authorObj = authRepo.findByName(author).orElseGet(()->{
-            Author newAuthor = new Author(author);
+    public Book addBook(@Argument("input")BookDto bookDto){
+        Author authorObj = authRepo.findByName(bookDto.getAuthor()).orElseGet(()->{
+            Author newAuthor = new Author(bookDto.getAuthor());
             return authRepo.save(newAuthor);
         });
-        Book book = bookRepo.findByName(name).orElseGet(()->{
-            Book newBook = new Book(name,authorObj,status);
+        User user = userRepo.findById(bookDto.getUserid()).orElseThrow(()->new UsernameNotFoundException("User not found"));
+        Book book = bookRepo.findByName(bookDto.getName()).orElseGet(()->{
+            Book newBook = new Book(user,bookDto.getName(),authorObj, bookDto.getStatus());
             return bookRepo.save(newBook);
         });
         authorObj.addBook(book);

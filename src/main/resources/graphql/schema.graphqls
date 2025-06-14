@@ -1,7 +1,28 @@
+type User{
+    id: ID!,
+    name: String!,
+    email: String!,
+    jwt: String,
+    books: [Book],
+}
+
+input UserInput{
+    name: String,
+    email: String!,
+    password: String!
+}
+
 type Book{
     id: ID!,
     name: String!,
     author: Author!,
+    status: String!
+}
+
+input BookInput{
+    userid: ID!,
+    name: String!,
+    author: String!,
     status: String!
 }
 
@@ -12,11 +33,13 @@ type Author{
 }
 
 type Query{
+    loginUser(input:UserInput!):User!
     fetchBookById(id:ID!): Book
     fetchBooks:[Book]
-    fetchBooksByAuthor(id:ID!) : [Book]
+    fetchBooksByAuthor(id:ID!):[Book]
 }
 
 type Mutation{
-    addBook(name:String!,author:String!,status:String!):Book!
+    addUser(input:UserInput!): ID!
+    addBook(input: BookInput) :Book
 }
