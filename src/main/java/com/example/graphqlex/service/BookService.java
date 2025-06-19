@@ -36,7 +36,7 @@ public class BookService {
             UsersBooks ub = new UsersBooks(user, book, author, bookDto.getStatus());
             return usersBooksRepo.save(ub);
         });
-
+        entry.setStatus(bookDto.getStatus());
 //        author.addUser(user);
 //        user.addAuthor(author);
         user.addBookWithStatus(entry, book, author);
