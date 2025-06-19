@@ -15,15 +15,23 @@ import java.util.Set;
 @Setter
 @Getter
 @Entity
+@Table(name = "authors")
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="author_id")
     private Long id;
     private String name;
+
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
-    Set<Book> books = new HashSet<>();
+    private Set<Book> books = new HashSet<>();
+
+//    @ManyToMany(mappedBy = "authors", fetch = FetchType.LAZY)
+//    private Set<User> users = new HashSet<>();
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<UsersBooks> usersBooks = new HashSet<>();
 
     public Author(String name){
         this.name = name;
@@ -33,4 +41,11 @@ public class Author {
         this.books.add(book);
         book.setAuthor(this);
     }
+
+//    public void addUser(User user) {
+//        this.users.add(user);
+//        if (!user.getAuthors().contains(this)) {
+//            user.getAuthors().add(this);
+//        }
+//    }
 }

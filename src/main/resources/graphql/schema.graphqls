@@ -16,7 +16,14 @@ type Book{
     id: ID!,
     name: String!,
     author: Author!,
-    status: String!
+}
+
+type BookResponse{
+    id: ID!,
+    user: User,
+    book: Book,
+    author: Author,
+    status: String,
 }
 
 input BookInput{
@@ -41,5 +48,5 @@ type Query{
 
 type Mutation{
     addUser(input:UserInput!): ID!
-    addBook(input: BookInput) :Book
+    addBook(input: BookInput) : BookResponse
 }
