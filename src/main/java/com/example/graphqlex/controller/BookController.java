@@ -9,6 +9,7 @@ import com.example.graphqlex.repository.AuthorRepository;
 import com.example.graphqlex.repository.BookRepository;
 import com.example.graphqlex.repository.UserRepository;
 import com.example.graphqlex.repository.UsersBooksRepository;
+import com.example.graphqlex.service.BookService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -24,15 +25,7 @@ import java.util.List;
 @AllArgsConstructor
 public class BookController {
     private final BookRepository bookRepo;
-    private final AuthorRepository authRepo;
-    private final UserRepository userRepo;
-    private final UsersBooksRepository usersBooksRepo;
-
-
-    @QueryMapping
-    public List<Book> fetchBooks(){
-        return bookRepo.findAll();
-    }
+    private final BookService bookService;
 
     @QueryMapping
     public Book fetchBookById(@Argument Long id){
@@ -42,33 +35,11 @@ public class BookController {
     @Transactional
     @MutationMapping
     public UsersBooks addBook(@Argument("input")BookDto bookDto){
-        Author author = authRepo.findByName(bookDto.getAuthor()).orElseGet(()->{
-            Author newAuthor = new Author(bookDto.getAuthor());
-            return authRepo.save(newAuthor);
-        });
-        User user = userRepo.findById(bookDto.getUserid()).orElseThrow(()->new UsernameNotFoundException("User not found"));
-        Book book = bookRepo.findByName(bookDto.getName()).orElseGet(()->{
-            Book newBook = new Book(bookDto.getName(),author);
-            return bookRepo.save(newBook);
-        });
-        author.addBook(book);
-        UsersBooks entry = usersBooksRepo.findByBook_Id(book.getId()).orElseGet(()->{
-            UsersBooks ub = new UsersBooks(user, book, author, bookDto.getStatus());
-            return usersBooksRepo.save(ub);
-        });
-
-//        author.addUser(user);
-//        user.addAuthor(author);
-         user.addBookWithStatus(entry, book, author);
-//        System.out.println(book.getName());
-//        System.out.println(entry.getBook().getName());
-        bookRepo.save(book);
-        return entry;
+        return bookService.addBook(bookDto);
     }
 
     @QueryMapping
     public List<Book> fetchBooksByAuthor(@Argument Long id){
         return bookRepo.findByAuthor_Id(id);
     }
-
 }
