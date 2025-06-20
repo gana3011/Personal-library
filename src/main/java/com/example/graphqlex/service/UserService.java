@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private UserRepository userRepo;
     private PasswordEncoder passwordEncoder;
+    private JwtService jwtService;
 
     public Long addUser(UserDto userDto){
         if(userRepo.findByEmail(userDto.getEmail()).isPresent()){
@@ -34,6 +35,10 @@ public class UserService {
         if(!matches){
             throw new BadCredentialsException("Invalid credentials");
         }
-        return new UserResponseDto(user.getId(),user.getName(),user.getEmail());
+        String access = jwtService.generateAccessToken(userDto.getEmail());
+        String refresh = jwtService.generateRefreshToken(user.getId().toString());
+        System.out.println("refresh: "+refresh);
+        System.out.println("access: "+access);
+        return new UserResponseDto(user.getId(),user.getEmail(),access,refresh);
     }
 }

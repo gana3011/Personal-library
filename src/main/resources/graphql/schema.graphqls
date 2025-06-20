@@ -2,7 +2,8 @@ type User{
     id: ID!,
     name: String!,
     email: String!,
-    jwt: String,
+    access: String!,
+    refresh: String!,
     books: [Book],
 }
 
