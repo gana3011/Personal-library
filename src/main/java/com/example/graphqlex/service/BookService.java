@@ -13,6 +13,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class BookService {
@@ -37,12 +39,14 @@ public class BookService {
             return usersBooksRepo.save(ub);
         });
         entry.setStatus(bookDto.getStatus());
-//        author.addUser(user);
-//        user.addAuthor(author);
         user.addBookWithStatus(entry, book, author);
-//        System.out.println(book.getName());
-//        System.out.println(entry.getBook().getName());
         bookRepo.save(book);
         return entry;
     }
+
+    public List<UsersBooks> fetchBooksByUserId(Long userId) {
+        List<UsersBooks> books = usersBooksRepo.findByUser_id(userId);
+        return books;
+    }
+
 }

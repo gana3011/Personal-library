@@ -37,8 +37,6 @@ public class UserService {
         }
         String access = jwtService.generateAccessToken(userDto.getEmail());
         String refresh = jwtService.generateRefreshToken(user.getId().toString());
-        System.out.println("refresh: "+refresh);
-        System.out.println("access: "+access);
         return new UserResponseDto(user.getId(),user.getEmail(),access,refresh);
     }
 }

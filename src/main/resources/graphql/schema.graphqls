@@ -42,7 +42,8 @@ type Author{
 
 type Query{
     loginUser(input:UserInput!):User!
-    fetchBookById(id:ID!): Book
+    fetchBooksById(id:ID!): Book
+    fetchBooksByUserId(userId:ID!):[BookResponse]
     fetchBooksByAuthor(id:ID!):[Book]
 }
 

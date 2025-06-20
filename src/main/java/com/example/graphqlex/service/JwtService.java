@@ -44,9 +44,7 @@ public class JwtService {
     }
 
     public String extractEmail(String token) {
-        Claims claims = extractAllClaims(token);
-        String email = claims.get("email", String.class);
-        return email;
+        return extractAllClaims(token).getSubject();
     }
 
     public Date extractExpiration(String token) {
@@ -63,7 +61,13 @@ public class JwtService {
 
     private String createAccessToken(String email){
         Long expirationMillis = 1000L * 60 * 20;
-        return Jwts.builder().subject(email).issuedAt(new Date()).expiration(new Date(System.currentTimeMillis()+ expirationMillis)).signWith(getSecretKey()).compact();
+        return Jwts.builder().
+                subject(email).
+                issuedAt(new Date()).
+                expiration(new Date(System.currentTimeMillis()+ expirationMillis)).
+                signWith(getSecretKey()).
+                claim("type","access").
+                compact();
     }
 
     public String generateRefreshToken(String id){
@@ -86,6 +90,12 @@ public class JwtService {
     public boolean verifyToken(String jwt, UserDetails userDetails){
         String email = extractEmail(jwt);
         return (email.equals(userDetails.getUsername()) && !isExpired(jwt));
+
+    }
+
+    public boolean isAccessToken(String token) {
+            Claims claims = extractAllClaims(token);
+            return "access".equals(claims.get("type"));
 
     }
 }
