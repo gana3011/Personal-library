@@ -4,7 +4,6 @@ import com.example.graphqlex.dto.UserDto;
 import com.example.graphqlex.dto.UserResponseDto;
 import com.example.graphqlex.service.UserService;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.graphql.GraphQlTest;
 import org.springframework.graphql.test.tester.GraphQlTester;

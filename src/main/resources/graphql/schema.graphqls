@@ -28,7 +28,7 @@ type BookResponse{
 }
 
 input BookInput{
-    userid: ID!,
+    userId: ID!,
     name: String!,
     author: String!,
     status: String!
