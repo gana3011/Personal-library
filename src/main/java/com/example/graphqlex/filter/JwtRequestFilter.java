@@ -22,27 +22,60 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final MyUserDetailsService userDetailsService;
     private final JwtService jwtService;
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
         final String authorizationHeader = request.getHeader("Authorization");
         String email = null;
         String jwt = null;
 
-        if(authorizationHeader!=null && authorizationHeader.startsWith("Bearer ")){
-            jwt = authorizationHeader.substring(7);
-            if(jwtService.isAccessToken(jwt)) {
-                email = jwtService.extractEmail(jwt);
-            }
-        }
+        try {
+            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                jwt = authorizationHeader.substring(7);
 
-        if(email!=null && SecurityContextHolder.getContext().getAuthentication()==null){
-            var userDetails = userDetailsService.loadUserByUsername(email);
-            if(jwtService.verifyToken(jwt, userDetails)){
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                if (jwtService.isAccessToken(jwt)) {
+                    email = jwtService.extractEmail(jwt);
+                }
             }
-        }
-        filterChain.doFilter(request,response);
 
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                var userDetails = userDetailsService.loadUserByUsername(email);
+
+                if (jwtService.verifyToken(jwt, userDetails)) {
+                    var authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            }
+
+            // continue filter chain
+            filterChain.doFilter(request, response);
+
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("""
+            {
+                "error": "JWT expired"
+            }
+        """.formatted(e.getMessage()));
+        } catch (io.jsonwebtoken.JwtException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("""
+            {
+                "error": "Invalid JWT"
+            }
+        """.formatted(e.getMessage()));
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentType("application/json");
+            response.getWriter().write("""
+            {
+                "error": "Authentication error"
+            }
+        """.formatted(e.getMessage()));
+        }
     }
 }

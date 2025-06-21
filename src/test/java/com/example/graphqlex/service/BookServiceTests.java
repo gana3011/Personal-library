@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -187,5 +188,24 @@ public class BookServiceTests {
         verify(authorRepo, never()).save(any(Author.class));
         verify(bookRepo, times(1)).save(any(Book.class));
         verify(usersBooksRepo, never()).save(any(UsersBooks.class));
+    }
+
+    @Test
+    void testFetchBooksByUserId_UserExists(){
+        User user = new User();
+        user.setId(1L);
+        Author author = new Author("Author 1");
+        author.setId(1L);
+        Book book = new Book("Book 1", author);
+        book.setId(1L);
+        UsersBooks entry = new UsersBooks(user,book,author,"Completed");
+
+        when(usersBooksRepo.findByUser_id(user.getId())).thenReturn(List.of(entry));
+        List<UsersBooks> result = bookService.fetchBooksByUserId(user.getId());
+
+        assertNotNull(result);
+        assertEquals(1,result.size());
+        assertEquals(entry,result.get(0));
+        verify(usersBooksRepo).findByUser_id(user.getId());
     }
 }
