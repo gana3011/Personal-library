@@ -3,9 +3,10 @@ name: Spring Boot CI
 on:
   push:
     branches:
-      - [main]
+      - main
     pull_request:
-      branches: [main]
+      branches:
+      - main
 
 jobs:
   build:
