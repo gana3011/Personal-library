@@ -4,10 +4,11 @@ import com.example.graphqlex.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
+@ActiveProfiles("test")
 public class UserIntegrationTests extends IntegrationTestBase{
 
     @Autowired
