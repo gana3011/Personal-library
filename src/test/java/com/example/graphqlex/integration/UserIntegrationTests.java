@@ -33,4 +33,26 @@ public class UserIntegrationTests extends IntegrationTestBase{
 
         assertThat(userRepository.findByEmail("test@user.com")).isPresent();
     }
+
+    @Test
+    @Transactional
+    void testLoginUser(){
+            String query = """
+            query {
+                loginUser(input: {
+                    email: "test@user.com",
+                    password: "password"
+                }){
+                id
+                email
+                access
+                refresh
+              }
+            }
+        """;
+
+        graphQlTester.document(query)
+                .execute()
+                .path("loginUser").hasValue();
+    }
 }
