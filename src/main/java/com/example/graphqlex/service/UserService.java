@@ -4,11 +4,13 @@ import com.example.graphqlex.dto.UserDto;
 import com.example.graphqlex.dto.UserResponseDto;
 import com.example.graphqlex.models.User;
 import com.example.graphqlex.repository.UserRepository;
+import graphql.GraphQLException;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @Service
 @AllArgsConstructor
@@ -49,12 +51,31 @@ public class UserService {
         return new UserResponseDto(user.getId(),user.getEmail(),access,refresh);
     }
 
-    public String refresh(Long userId, String refreshToken){
-        User user = userRepo.findById(userId).orElseThrow(()->new UsernameNotFoundException("User not found"));
-        boolean exists = redisService.hasKey("refresh:"+user.getId().toString());
-        if(!exists){
-            throw new RuntimeException("Unauthorized");
+    public String refresh(String authHeader){
+        String refreshToken = authHeader.substring(7);
+        Long userId = Long.parseLong(jwtService.extractUserId(refreshToken));
+        try{
+            User user = userRepo.findById(userId).orElseThrow(()->new UsernameNotFoundException("User not found"));
+            String key = "refresh:" + user.getId().toString();
+            String token = (String) redisService.get(key);
+            if(token==null){
+                throw new RuntimeException("Token missing");
+            }
+
+            if(!token.equals(refreshToken)){
+                throw new RuntimeException("Invalid token");
+            }
+
+            boolean verify = jwtService.verifyRefreshToken(refreshToken, userId.toString());
+            if(!verify){
+                throw new RuntimeException("Invalid token");
+            }
+            return jwtService.generateAccessToken(user.getEmail());
         }
-        return jwtService.generateAccessToken(user.getEmail());
+
+        catch (Exception e){
+            throw new GraphQLException(e.getMessage());
+        }
+
     }
 }

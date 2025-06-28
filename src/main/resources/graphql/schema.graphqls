@@ -41,7 +41,6 @@ type Author{
 }
 
 type Query{
-    loginUser(input:UserInput!):User!
     fetchBooksById(id:ID!): Book
     fetchBooksByUserId(userId:ID!):[BookResponse]
     fetchBooksByAuthor(id:ID!):[Book]
@@ -49,6 +48,7 @@ type Query{
 
 type Mutation{
     addUser(input:UserInput!): ID!
+    loginUser(input:UserInput!):User!
     addBook(input: BookInput) : BookResponse
-    refresh(refresh: String!): String!
+    refresh: String!
 }

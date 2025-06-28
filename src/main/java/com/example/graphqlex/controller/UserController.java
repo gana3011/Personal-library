@@ -2,15 +2,12 @@ package com.example.graphqlex.controller;
 
 import com.example.graphqlex.dto.UserDto;
 import com.example.graphqlex.dto.UserResponseDto;
-import com.example.graphqlex.models.User;
-import com.example.graphqlex.repository.UserRepository;
 import com.example.graphqlex.service.UserService;
+import graphql.schema.DataFetchingEnvironment;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 
 @AllArgsConstructor
@@ -22,15 +19,16 @@ public class UserController {
         return userService.addUser(userDto);
     }
 
-    @QueryMapping
+    @MutationMapping
     public UserResponseDto loginUser(@Argument("input") UserDto userDto){
         return userService.loginUser(userDto);
     }
 
-//    @QueryMapping
-//    public String refresh(String refresh){
-//        return userService.
-//    }
-
+    @MutationMapping
+    public String refresh(DataFetchingEnvironment env) {
+        HttpServletRequest request = env.getGraphQlContext().get(HttpServletRequest.class);
+        String authHeader = request.getHeader("Authorization");
+        return userService.refresh(authHeader);
+    }
 
 }

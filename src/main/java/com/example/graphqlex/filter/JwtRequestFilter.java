@@ -32,13 +32,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         try {
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                 jwt = authorizationHeader.substring(7);
-
                 if (jwtService.isAccessToken(jwt)) {
                     email = jwtService.extractEmail(jwt);
-                }
-                else if(jwtService.isRefreshToken(jwt)){
-                    Long userId = Long.parseLong(jwtService.extractUserId(jwt));
-                    email = userDetailsService.loadUserById(userId).getUsername();
                 }
             }
 
