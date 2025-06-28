@@ -37,8 +37,8 @@ public class UserIntegrationTests extends IntegrationTestBase{
     @Test
     @Transactional
     void testLoginUser(){
-            String query = """
-            query {
+            String mutation = """
+            mutation {
                 loginUser(input: {
                     email: "test@user.com",
                     password: "password"
@@ -51,7 +51,7 @@ public class UserIntegrationTests extends IntegrationTestBase{
             }
         """;
 
-        graphQlTester.document(query)
+        graphQlTester.document(mutation)
                 .execute()
                 .path("loginUser").hasValue();
     }

@@ -53,8 +53,8 @@ class UserControllerTests {
 
         when(userService.loginUser(any(UserDto.class))).thenReturn(responseDto);
 
-        String query = """
-            query {
+        String mutation = """
+            mutation{
               loginUser(input: {
                 email: "test@gmail.com",
                 password: "password"
@@ -67,7 +67,7 @@ class UserControllerTests {
             }
         """;
 
-        graphQlTester.document(query)
+        graphQlTester.document(mutation)
                 .execute()
                 .path("loginUser.id").entity(Long.class).isEqualTo(1L)
                 .path("loginUser.email").entity(String.class).isEqualTo("test@gmail.com")
