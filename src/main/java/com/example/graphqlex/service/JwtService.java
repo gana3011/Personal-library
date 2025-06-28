@@ -4,7 +4,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -22,6 +21,9 @@ public class JwtService {
     public JwtService(@Value("${jwt.secret}") String secret) {
         this.secret = secret;
     }
+
+    public Long refreshExpiration = 1000L * 60 * 60 * 24 * 14;
+    public Long accessExpiration = 1000L * 60 * 20;
 
     private Key secretKey;
 
@@ -47,6 +49,8 @@ public class JwtService {
         return extractAllClaims(token).getSubject();
     }
 
+    public String extractUserId(String token){return extractAllClaims(token).getSubject();}
+
     public Date extractExpiration(String token) {
         return extractAllClaims(token).getExpiration(); // exp = expiration
     }
@@ -60,11 +64,10 @@ public class JwtService {
     }
 
     private String createAccessToken(String email){
-        Long expirationMillis = 1000L * 60 * 20;
         return Jwts.builder().
                 subject(email).
                 issuedAt(new Date()).
-                expiration(new Date(System.currentTimeMillis()+ expirationMillis)).
+                expiration(new Date(System.currentTimeMillis()+ accessExpiration)).
                 signWith(getSecretKey()).
                 claim("type","access").
                 compact();
@@ -75,28 +78,35 @@ public class JwtService {
     }
 
     private String createRefreshToken(String id) {
-        long expirationMillis = 1000L * 60 * 60 * 24 * 14;
         String jti = UUID.randomUUID().toString();
         return Jwts.builder()
                 .subject(id)
                 .id(jti)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expirationMillis))
+                .expiration(new Date(System.currentTimeMillis() + refreshExpiration))
                 .claim("type", "refresh")
                 .signWith(getSecretKey())
                 .compact();
     }
 
-    public boolean verifyToken(String jwt, UserDetails userDetails){
+    public boolean verifyAccessToken(String jwt, UserDetails userDetails){
         String email = extractEmail(jwt);
         return (email.equals(userDetails.getUsername()) && !isExpired(jwt));
+    }
 
+    public boolean verifyRefreshToken(String jwt, String userId){
+        String id = extractUserId(jwt);
+        return (id.equals(userId) && !isExpired(jwt));
     }
 
     public boolean isAccessToken(String token) {
             Claims claims = extractAllClaims(token);
             return "access".equals(claims.get("type"));
+    }
 
+    public boolean isRefreshToken(String token) {
+        Claims claims = extractAllClaims(token);
+        return "refresh".equals(claims.get("type"));
     }
 }
 

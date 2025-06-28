@@ -50,4 +50,5 @@ type Query{
 type Mutation{
     addUser(input:UserInput!): ID!
     addBook(input: BookInput) : BookResponse
+    refresh(refresh: String!): String!
 }

@@ -1,5 +1,6 @@
 package com.example.graphqlex.filter;
 
+import com.example.graphqlex.models.User;
 import com.example.graphqlex.service.JwtService;
 import com.example.graphqlex.service.MyUserDetailsService;
 import jakarta.servlet.FilterChain;
@@ -11,7 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -36,12 +36,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 if (jwtService.isAccessToken(jwt)) {
                     email = jwtService.extractEmail(jwt);
                 }
+                else if(jwtService.isRefreshToken(jwt)){
+                    Long userId = Long.parseLong(jwtService.extractUserId(jwt));
+                    email = userDetailsService.loadUserById(userId).getUsername();
+                }
             }
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 var userDetails = userDetailsService.loadUserByUsername(email);
 
-                if (jwtService.verifyToken(jwt, userDetails)) {
+                if (jwtService.verifyAccessToken(jwt, userDetails)) {
                     var authToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -49,7 +53,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 }
             }
 
-            // continue filter chain
             filterChain.doFilter(request, response);
 
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
