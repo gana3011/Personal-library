@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Navigation from "@/app/components/Navigation";
-import { BookOpen, Users, Plus, TrendingUp, Star, Calendar } from "lucide-react";
+import { BookOpen, Users, TrendingUp} from "lucide-react";
 
 const Index = () => {
   return (
@@ -96,7 +96,7 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-sky-blue to-blue-600">
+      <section className="py-10 bg-gradient-to-r from-sky-blue to-blue-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Start Your Reading Journey?
@@ -108,21 +108,6 @@ const Index = () => {
           </Link>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-almost-black text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <BookOpen className="h-8 w-8 text-sky-blue" />
-              <span className="text-2xl font-bold">BookTracker</span>
-            </div>
-            <div className="text-gray-400">
-              © 2024 BookTracker. All rights reserved.
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

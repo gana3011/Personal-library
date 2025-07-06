@@ -1,0 +1,140 @@
+'use client'
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Navigation from "@/app/components/Navigation";
+import { BookOpen } from "lucide-react";
+import { useState } from "react";
+import {useMutation } from "@apollo/client";
+import { ADD_USER } from "@/graphql/mutations";
+
+//1.redirect after signup
+//2.proper error handling and toast
+//3.signin logic also
+const SignUp = () => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [addUser, {data, loading, error}] = useMutation(ADD_USER);
+
+  const handleSumbit = async (e:React.FormEvent) =>{
+    e.preventDefault();
+    if(password !== confirmPassword){
+      //add toast here
+      return;
+    }
+    try{
+      const {data} = await addUser({
+        variables: {
+          userInput: {
+            name: name,
+            email: email, 
+            password: password
+          },
+        },
+      });
+      console.log(data);
+    } catch(err){
+      console.log(err);
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-soft-white">
+      <Navigation />
+      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] py-12 px-4 sm:px-6 lg:px-8">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="flex items-center justify-center mb-4">
+              <BookOpen className="h-10 w-10 text-sky-blue" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-almost-black">
+              Create Account
+            </CardTitle>
+            <CardDescription className="text-slate-gray">
+              Join BookTracker and start organizing your reading journey
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent className="space-y-6">
+            <form className="space-y-4" onSubmit={handleSumbit}>
+              <div className="grid gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-almost-black">Name</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="John"
+                    value={name}
+                    onChange={(e)=>setName(e.target.value)}
+                    className="border-gray-300 focus:border-sky-blue focus:ring-sky-blue"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-almost-black">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="john@example.com"
+                  value={email}
+                  onChange={(e)=>setEmail(e.target.value)}
+                  className="border-gray-300 focus:border-sky-blue focus:ring-sky-blue"
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-almost-black">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Create a password"
+                  value={password}
+                  onChange={(e)=>setPassword(e.target.value)}
+                  className="border-gray-300 focus:border-sky-blue focus:ring-sky-blue"
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-almost-black">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="Confirm your password"
+                  value={confirmPassword}
+                  onChange={(e)=>setConfirmPassword(e.target.value)}
+                  className="border-gray-300 focus:border-sky-blue focus:ring-sky-blue"
+                  required
+                />
+              </div>
+              <Button
+                type="submit"
+                className="w-full bg-sky-blue hover:bg-blue-600 text-white"
+              >
+                Create Account
+              </Button>
+            </form>
+            
+            <div className="text-center">
+              <p className="text-slate-gray">
+                Already have an account?{" "}
+                <Link href="/signin" className="text-sky-blue hover:underline font-medium">
+                  Sign in
+                </Link>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default SignUp;

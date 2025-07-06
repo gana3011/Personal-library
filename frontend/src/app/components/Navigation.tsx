@@ -2,7 +2,6 @@
 
 import  Link  from "next/link";
 import { Button } from "@/components/ui/button";
-import { useLocation } from "react-router-dom";
 import { BookOpen, User, Plus, Library, Users } from "lucide-react";
 import { usePathname } from "next/navigation";
 
