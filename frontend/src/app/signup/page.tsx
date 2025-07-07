@@ -7,18 +7,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Navigation from "@/app/components/Navigation";
 import { BookOpen } from "lucide-react";
 import { useState } from "react";
-import {useMutation } from "@apollo/client";
-import { ADD_USER } from "@/graphql/mutations";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../contexts/AuthContext";
 
-//1.redirect after signup
-//2.proper error handling and toast
-//3.signin logic also
+//1.proper error handling and toast
+//2.signout
+//3.setting cookies in the backend
+
 const SignUp = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [addUser, {data, loading, error}] = useMutation(ADD_USER);
+  const {signUp, loading} = useAuth();
+  const router = useRouter();
 
   const handleSumbit = async (e:React.FormEvent) =>{
     e.preventDefault();
@@ -27,16 +29,8 @@ const SignUp = () => {
       return;
     }
     try{
-      const {data} = await addUser({
-        variables: {
-          userInput: {
-            name: name,
-            email: email, 
-            password: password
-          },
-        },
-      });
-      console.log(data);
+      await signUp(name, email, password);
+      router.push("/signin");
     } catch(err){
       console.log(err);
     }
@@ -117,8 +111,9 @@ const SignUp = () => {
               <Button
                 type="submit"
                 className="w-full bg-sky-blue hover:bg-blue-600 text-white"
+                disabled={loading}
               >
-                Create Account
+              {loading ? 'Please Wait...': 'Create Account'}
               </Button>
             </form>
             
