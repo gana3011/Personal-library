@@ -5,6 +5,7 @@ import com.example.graphqlex.dto.UserResponseDto;
 import com.example.graphqlex.models.User;
 import com.example.graphqlex.repository.UserRepository;
 import graphql.GraphQLException;
+import jakarta.servlet.http.Cookie;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -47,8 +48,7 @@ public class UserService {
             System.out.printf("Failed to save refresh token in Redis for user {}", user.getId(), e);
 //            throw new IllegalStateException("Redis unavailable. Cannot save refresh token.");
         }
-
-        return new UserResponseDto(user.getId(),user.getEmail(),access,refresh);
+        return new UserResponseDto(user.getId(),user.getName(),access,refresh);
     }
 
     public String refresh(String authHeader){
