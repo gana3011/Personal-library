@@ -16,11 +16,13 @@ import { useRouter } from "next/navigation";
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const {signIn, isLoading} = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const {signIn} = useAuth();
   const {toast} = useToast();
   const router = useRouter();
   const handleSubmit =  async (e:React.FormEvent) =>{
     e.preventDefault();
+    setIsLoading(true);
     try{
       await signIn(email, password);
       toast({
@@ -35,6 +37,9 @@ const SignIn = () => {
         variant: "destructive",
       });
       console.log(err);
+    }
+    finally{
+      setIsLoading(false);
     }
 
   }

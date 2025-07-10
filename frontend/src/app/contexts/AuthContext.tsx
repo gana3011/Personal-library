@@ -55,8 +55,11 @@ const signUp = async (name: String, email: String, password: String)=>{
             name: name,
             email: email, 
             password: password
-          },
+          },      
         },
+        context: {
+           skipAuth: true
+        }
       });
       return true;
     }
@@ -78,6 +81,9 @@ const signIn = async (email: String, password: String) => {
             password: password,
           },
         },
+        context: {
+          skipAuth: true
+        }
       });
       const user = data.loginUser;
       if(user){

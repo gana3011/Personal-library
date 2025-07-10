@@ -4,8 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Navigation from "@/app/components/Navigation";
 import { BookOpen, Users, TrendingUp} from "lucide-react";
+import { useEffect } from 'react';
+import { useAuth } from './contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 const Index = () => {
+  const{user, isLoading} = useAuth();
+  const router = useRouter();
+
+  useEffect(()=>{
+    if(!isLoading && user){
+      router.push("/books");
+    }
+  },[user, isLoading])
   return (
     <div className="min-h-screen bg-soft-white">
       <Navigation />

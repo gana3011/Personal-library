@@ -40,12 +40,12 @@ export function BookProvider({children} : {children: React.ReactNode}){
 //   });
     const fetchBooks = async () => {
         console.log("fetching...");
-        console.log(user);
+        // console.log(user);
         if(!user) return;
         setIsLoading(true);
         try{
             const token = localStorage.getItem('accessToken');
-            console.log(`token:${token}`);
+            // console.log(`token:${token}`);
             const result = await fetchBooksByUserId({
                 variables:{
                     userId: user.id
