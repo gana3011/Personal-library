@@ -44,7 +44,7 @@ public class UserIntegrationTests extends IntegrationTestBase{
                     password: "password"
                 }){
                 id
-                email
+                name
                 access
                 refresh
               }
