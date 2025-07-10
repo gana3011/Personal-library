@@ -6,7 +6,8 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 interface User{
     id: String,
-    name: String
+    name: String,
+    access: String
 }
 
 interface AuthContextType {
@@ -14,7 +15,7 @@ interface AuthContextType {
     signIn: (email:string, password:string) => Promise<void>
     signUp: (name: string, email: string, password: string) => Promise<Boolean>;
     // signOut: () => void;
-    loading: boolean;
+    isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,24 +24,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [addUser, {loading: addUserLoading}] = useMutation(ADD_USER);
   const [loginUser, {loading: loginLoading}] = useMutation(LOGIN_USER);
-  const loading = loginLoading || addUserLoading;
-
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem('accessToken');
   const userData = localStorage.getItem('user');
 
   if (token && userData) {
     try {
       const parsedUser = JSON.parse(userData);
+      // console.log(parsedUser);
       setUser(parsedUser);
     } catch (err) {
       localStorage.removeItem('user');
-      localStorage.removeItem('authToken');
+      localStorage.removeItem('accessToken');
     }
+    setIsLoading(false);
   }
 }, []);
 
+useEffect(()=>{
+
+})
+
 const signUp = async (name: String, email: String, password: String)=>{
+  setIsLoading(true);
     try{
         await addUser({
         variables: {
@@ -56,9 +63,13 @@ const signUp = async (name: String, email: String, password: String)=>{
     catch(error){
         throw error;
     }
+    finally{
+      setIsLoading(false);
+    }
 }
 
 const signIn = async (email: String, password: String) => {
+  setIsLoading(true);
     try{
         const {data} = await loginUser({
         variables : {
@@ -69,20 +80,22 @@ const signIn = async (email: String, password: String) => {
         },
       });
       const user = data.loginUser;
-      console.log(user);
       if(user){
         localStorage.setItem('accessToken', user.access);
-        localStorage.setItem('userId',user.id);
+        localStorage.setItem('user', JSON.stringify(user));
         setUser(user);
       }
     }
     catch(error){
         throw error;
     }
+    finally{
+      setIsLoading(false);
+    }
 }
 
 return (
-    <AuthContext.Provider value={{user,loading,signIn, signUp }}>
+    <AuthContext.Provider value={{user,isLoading,signIn, signUp }}>
       {children}
     </AuthContext.Provider>
 );

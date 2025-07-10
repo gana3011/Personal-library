@@ -9,30 +9,40 @@ import { BookOpen } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
-//1.proper error handling and toast
-//2.signout
-//3.setting cookies in the backend
+//1.signout
+//2.books page
 
 const SignUp = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const {signUp, loading} = useAuth();
+  const {signUp, isLoading} = useAuth();
+  const {toast} = useToast();
   const router = useRouter();
 
   const handleSumbit = async (e:React.FormEvent) =>{
+    
     e.preventDefault();
     if(password !== confirmPassword){
-      //add toast here
+      toast({
+        title: "Passwords don't match",
+        description: "Please make sure your passwords match.",
+        variant: "destructive",
+      });
       return;
     }
     try{
       await signUp(name, email, password);
       router.push("/signin");
-    } catch(err){
-      console.log(err);
+    } catch(err: any){
+      toast({
+        title: "Sign up failed",
+        description: "Can't create a account, please try again after some time.",
+        variant: "destructive",
+      });
     }
   }
 
@@ -111,9 +121,9 @@ const SignUp = () => {
               <Button
                 type="submit"
                 className="w-full bg-sky-blue hover:bg-blue-600 text-white"
-                disabled={loading}
+                disabled={isLoading}
               >
-              {loading ? 'Please Wait...': 'Create Account'}
+              {isLoading ? 'Please Wait...': 'Create Account'}
               </Button>
             </form>
             

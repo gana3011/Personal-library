@@ -23,7 +23,7 @@ const Navigation = () => {
           
           <div className="hidden md:flex items-center space-x-6">
             <Link 
-              href="/my-books" 
+              href="/books" 
               className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 isActive('/my-books') 
                   ? 'text-sky-blue bg-blue-50' 

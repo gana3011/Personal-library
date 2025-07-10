@@ -12,7 +12,6 @@ loginUser(input: $userInput){
 id,
 name,
 access,
-refresh
 }
 }
 `

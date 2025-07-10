@@ -9,16 +9,31 @@ import Navigation from "@/app/components/Navigation";
 import { BookOpen } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const {signIn, loading} = useAuth();
+  const {signIn, isLoading} = useAuth();
+  const {toast} = useToast();
+  const router = useRouter();
   const handleSubmit =  async (e:React.FormEvent) =>{
     e.preventDefault();
     try{
       await signIn(email, password);
+      toast({
+        title: "Welcome back!",
+        description: "You've successfully signed in.",
+      });
+      router.push("/books");
     } catch(err){
+       toast({
+        title: "Sign in failed",
+        description: "Please check your credentials and try again.",
+        variant: "destructive",
+      });
       console.log(err);
     }
 
@@ -78,9 +93,9 @@ const SignIn = () => {
               <Button
                 type="submit"
                 className="w-full bg-sky-blue hover:bg-blue-600 text-white"
-                disabled={loading}
+                disabled={isLoading}
               >
-                {loading? 'Please wait...': 'Sign in'}
+                {isLoading? 'Please wait...': 'Sign in'}
               </Button>
             </form>
             
