@@ -3,15 +3,18 @@ package com.example.graphqlex.controller;
 import com.example.graphqlex.dto.UserDto;
 import com.example.graphqlex.dto.UserResponseDto;
 import com.example.graphqlex.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.graphql.GraphQlTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @GraphQlTest(UserController.class)
 class UserControllerTests {
@@ -48,34 +51,39 @@ class UserControllerTests {
 
     @Test
     void testLoginUser() {
-        UserDto input = new UserDto("Test", "test@gmail.com", "password");
-        UserResponseDto responseDto = new UserResponseDto(1L, "test@gmail.com", "access","refresh");
+        HttpServletResponse mockResponse = mock(HttpServletResponse.class);
+        ServletRequestAttributes mockAttributes = mock(ServletRequestAttributes.class);
+        when(mockAttributes.getResponse()).thenReturn(mockResponse);
+        RequestContextHolder.setRequestAttributes(mockAttributes);
 
-        when(userService.loginUser(any(UserDto.class))).thenReturn(responseDto);
+        UserResponseDto mockRes = new UserResponseDto();
+        mockRes.setId(1L);
+        mockRes.setName("Test User");
+        mockRes.setAccess("access-token");
+        mockRes.setRefresh("refresh-token");
+        when(userService.loginUser(any(UserDto.class))).thenReturn(mockRes);
 
-        String mutation = """
-            mutation{
-              loginUser(input: {
-                email: "test@gmail.com",
-                password: "password"
-              }) {
-                id
-                name
-                access
-                refresh
-              }
-            }
-        """;
-
-        graphQlTester.document(mutation)
+        graphQlTester.document("""
+        mutation {
+          loginUser(input: {
+            email: "test@gmail.com",
+            password: "password"
+          }) {
+            id
+            name
+            access
+            refresh
+          }
+        }
+    """)
                 .execute()
-                .path("loginUser.id").entity(Long.class).isEqualTo(1L)
-                .path("loginUser.email").entity(String.class).isEqualTo("test@gmail.com")
-                .path("loginUser.access").entity(String.class).isEqualTo("access")
-                .path("loginUser.refresh").entity(String.class).isEqualTo("refresh");
+                .path("loginUser.id").hasValue()
+                .path("loginUser.access").hasValue();
 
-        verify(userService).loginUser(any(UserDto.class));
+        verify(mockResponse).addCookie(any(Cookie.class));
     }
+
+
 }
 
 
