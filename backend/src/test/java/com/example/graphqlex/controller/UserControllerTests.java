@@ -60,7 +60,7 @@ class UserControllerTests {
                 password: "password"
               }) {
                 id
-                email
+                name
                 access
                 refresh
               }
