@@ -6,6 +6,7 @@ import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { FETCH_BOOKS } from "@/graphql/queries";
 
 export interface Book {
+id: string
   book: {
     name: string;
   };
@@ -13,6 +14,7 @@ export interface Book {
     name: string;
   };
   status: string;
+  dateAdded: string;
 }
 
 
@@ -56,7 +58,9 @@ export function BookProvider({children} : {children: React.ReactNode}){
                     }
                 }
             });
-             console.log(result.data.fetchBooksByUserId);
+            // console.log(result.data.fetchBooksByUserId);
+            setBooks(result.data?.fetchBooksByUserId || []);
+           
         }
         catch(error){
             throw error;

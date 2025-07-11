@@ -1,5 +1,8 @@
 import { setContext } from "@apollo/client/link/context";
 import { ApolloClient, HttpLink, InMemoryCache, gql } from "@apollo/client";
+import { refreshClient } from "./refreshClient";
+
+
 
 const REFRESH = gql`
   mutation RefreshToken {
@@ -7,13 +10,7 @@ const REFRESH = gql`
   }
 `;
 
-const refreshClient = new ApolloClient({
-  link: new HttpLink({
-    uri: "http://localhost:8080/graphql",
-    credentials: "include", 
-  }),
-  cache: new InMemoryCache(),
-});
+
 
 const isTokenExpired = (token: string): boolean => {
   try {

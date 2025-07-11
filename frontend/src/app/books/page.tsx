@@ -14,10 +14,13 @@ import { useBook } from "../contexts/BookContext";
 const MyBooks = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const {fetchBooks, isLoading} = useBook();
+  const {books, isLoading} = useBook();
 
-  // Mock data
-  const books = [
+  useEffect(()=>{
+    console.log(books)
+  },[books, isLoading]);
+
+  const dummybooks = [
     {
       id: 1,
       title: "The Great Gatsby",
@@ -111,8 +114,8 @@ const MyBooks = () => {
   };
 
   const filteredBooks = books.filter(book => {
-    const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         book.author.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = book.book.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         book.author.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === "all" || book.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
@@ -153,7 +156,8 @@ const MyBooks = () => {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-3 h-4 w-4 text-slate-gray" />
             <Input
-              placeholder="Search books or authors..."
+              placeholder="Search books
+           or authors..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 border-gray-300 focus:border-sky-blue focus:ring-sky-blue"
@@ -174,8 +178,9 @@ const MyBooks = () => {
         </div>
 
         {/* Books Grid */}
+        {isLoading && <div>Loading books...</div>}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredBooks.map((book) => (
+          {books.map((book) => (
             <Card key={book.id} className="hover:shadow-lg transition-shadow">
               <CardHeader className="pb-4">
                 <div className="flex items-start space-x-4">
@@ -184,11 +189,11 @@ const MyBooks = () => {
                   </div>
                   <div className="flex-1">
                     <CardTitle className="text-lg text-almost-black leading-tight">
-                      {book.title}
+                      {book.book.name}
                     </CardTitle>
                     <CardDescription className="flex items-center mt-1">
                       <User className="h-3 w-3 mr-1" />
-                      {book.author}
+                      {book.author.name}
                     </CardDescription>
                     <div className="mt-2">
                       <Badge className={getStatusColor(book.status)}>
@@ -200,12 +205,7 @@ const MyBooks = () => {
               </CardHeader>
               
               <CardContent className="pt-0">
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-gray">Rating:</span>
-                    {renderStars(book.rating)}
-                  </div>
-                  
+                <div className="space-y-3">   
                   <div className="flex justify-between text-sm">
                     <span className="text-slate-gray">Genre:</span>
                     <span className="text-almost-black">{book.genre}</span>
@@ -249,7 +249,8 @@ const MyBooks = () => {
         {filteredBooks.length === 0 && (
           <div className="text-center py-12">
             <BookOpen className="h-16 w-16 text-slate-gray mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-almost-black mb-2">No books found</h3>
+            <h3 className="text-xl font-semibold text-almost-black mb-2">No books
+           found</h3>
             <p className="text-slate-gray mb-4">
               {searchTerm || filterStatus !== "all"
                 ? "Try adjusting your search or filter criteria"

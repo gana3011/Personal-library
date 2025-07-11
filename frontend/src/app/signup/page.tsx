@@ -11,8 +11,6 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
-//1.signout
-//2.books page
 
 const SignUp = () => {
   const [name, setName] = useState('');
